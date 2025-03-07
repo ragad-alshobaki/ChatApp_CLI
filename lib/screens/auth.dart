@@ -25,22 +25,25 @@ class _AuthScreenState extends State<AuthScreen> {
 
     if (valid) return;
 
-    if (_isLogin) {
-      
-    }else{
-      try {
-        final UserCredential userCredential = await _firebase.createUserWithEmailAndPassword(
-        email: _emailValue,
-        password: _passwordValue,
-      );
-      }on FirebaseAuthException catch (e) {
-      //show e.msg as snack bar:
-       ScaffoldMessenger.of(context).clearSnackBars();
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Authentecation Failed'))
-       );
+    try {
+      if (_isLogin) {
+        final UserCredential userCredential = await _firebase.signInWithEmailAndPassword( //in firebase =http req.
+          email: _emailValue,
+          password: _passwordValue,
+        );
+      }else{
+          final UserCredential userCredential = await _firebase.createUserWithEmailAndPassword(
+          email: _emailValue,
+          password: _passwordValue,
+        );
       }
-    }
+    }on FirebaseAuthException catch (e) {
+        //show e.msg as snack bar:
+         ScaffoldMessenger.of(context).clearSnackBars();
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'Authentecation Failed'),)
+         );
+        }
 
      _formKey.currentState!.save();
      log(_emailValue); 
