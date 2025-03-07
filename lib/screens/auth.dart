@@ -23,7 +23,7 @@ class _AuthScreenState extends State<AuthScreen> {
   void _submit() async{
     final valid = _formKey.currentState!.validate();
 
-    if (valid) return;
+    if (!valid) return;
 
     try {
       if (_isLogin) {
