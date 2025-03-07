@@ -13,8 +13,39 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   var _isLogin = true;
 
+  var _emailValue = '';     //or via   TextEditingController _emailValue = TextEditingController();
+  var _passwordValue = '';  //or via   TextEditingController _passwordValue = TextEditingController();
+
+  void _submit() async{
+    final valid = _formKey.currentState!.validate();
+
+    if (valid) return;
+
+    if (_isLogin) {
+      
+    }else{
+      try {
+        final UserCredential userCredential = await _firebase.createUserWithEmailAndPassword(
+        email: _emailValue,
+        password: _passwordValue,
+      );
+      }on FirebaseAuthException catch (e) {
+      //show e.msg as snack bar:
+       ScaffoldMessenger.of(context).clearSnackBars();
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Authentecation Failed'))
+       );
+      }
+    }
+
+     _formKey.currentState!.save();
+     log(_emailValue); 
+     log(_passwordValue); 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +72,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Padding(
                     padding: EdgeInsets.all(16),
                     child: Form(
+                      key: _formKey,
                       child: Column(
                         children: [
                           TextFormField(
@@ -50,6 +82,8 @@ class _AuthScreenState extends State<AuthScreen> {
                             keyboardType: TextInputType.emailAddress,
                             autocorrect: false,
                             textCapitalization: TextCapitalization.none,
+                            onSaved: (value)=> _emailValue = value!,
+                            //Firebade have regularExpression
                             validator: (value) {
                               if(value == null || value.trim().isEmpty || !value.contains('@')) {
                                 return 'Please enter a valid email address.';
@@ -62,6 +96,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               labelText:'Password' 
                             ),
                             obscureText: true,
+                            onSaved: (value)=> _passwordValue = value!,
                             validator: (value) {
                               if(value == null || value.trim().length < 6) {
                                 return 'Password must be at least 6 charachters long.';
@@ -71,7 +106,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           SizedBox(height: 12,),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: _submit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                 Theme.of(context).colorScheme.primaryContainer,
@@ -101,3 +136,4 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
+}
