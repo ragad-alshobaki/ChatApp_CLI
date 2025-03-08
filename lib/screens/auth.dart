@@ -17,25 +17,33 @@ class _AuthScreenState extends State<AuthScreen> {
 
   var _isLogin = true;
 
-  var _emailValue = '';     //or via   TextEditingController _emailValue = TextEditingController();
-  var _passwordValue = '';  //or via   TextEditingController _passwordValue = TextEditingController();
+  //var _emailValue = '';
+  final TextEditingController _emailController = TextEditingController();
+  //var _passwordValue = '';
+  final TextEditingController _passwordController = TextEditingController();
 
   void _submit() async{
     final valid = _formKey.currentState!.validate();
 
     if (!valid) return;
 
+    //for controller:
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
     try {
       if (_isLogin) {
         final UserCredential userCredential = await _firebase.signInWithEmailAndPassword( //in firebase =http req.
-          email: _emailValue,
-          password: _passwordValue,
+          email: email,
+          password: password,
         );
+        print('User logged in: ${userCredential.user?.email}');
       }else{
           final UserCredential userCredential = await _firebase.createUserWithEmailAndPassword(
-          email: _emailValue,
-          password: _passwordValue,
+          email: email,
+          password: password,
         );
+        print('User signed up: ${userCredential.user?.email}');
       }
     }on FirebaseAuthException catch (e) {
         //show e.msg as snack bar:
@@ -46,8 +54,8 @@ class _AuthScreenState extends State<AuthScreen> {
         }
 
      _formKey.currentState!.save();
-     log(_emailValue); 
-     log(_passwordValue); 
+    //  log(_emailValue); 
+    //  log(_passwordValue); 
   }
 
   @override
@@ -79,14 +87,15 @@ class _AuthScreenState extends State<AuthScreen> {
                       child: Column(
                         children: [
                           TextFormField(
+                            controller: _emailController,
                             decoration: InputDecoration(
                               labelText:'Email Address' 
                             ),
                             keyboardType: TextInputType.emailAddress,
                             autocorrect: false,
                             textCapitalization: TextCapitalization.none,
-                            onSaved: (value)=> _emailValue = value!,
-                            //Firebade have regularExpression
+                            // onSaved: (value)=> _emailValue = value!,
+                            //Firebase have regularExpression
                             validator: (value) {
                               if(value == null || value.trim().isEmpty || !value.contains('@')) {
                                 return 'Please enter a valid email address.';
@@ -95,11 +104,12 @@ class _AuthScreenState extends State<AuthScreen> {
                             },
                           ),
                           TextFormField(
+                            controller: _passwordController,
                             decoration: InputDecoration(
                               labelText:'Password' 
                             ),
                             obscureText: true,
-                            onSaved: (value)=> _passwordValue = value!,
+                            // onSaved: (value)=> _passwordValue = value!,
                             validator: (value) {
                               if(value == null || value.trim().length < 6) {
                                 return 'Password must be at least 6 charachters long.';
