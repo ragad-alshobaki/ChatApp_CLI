@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:chat_app_cli/widgets/user_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,6 +87,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          if(!_isLogin)
+                          UserImagePicker(),
                           TextFormField(
                             controller: _emailController,
                             decoration: InputDecoration(
